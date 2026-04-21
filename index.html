@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Admin Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon"><i class="bi bi-shield-check"></i></div>
+        <div>
+          <div class="brand-title">Admin Console</div>
+          <div class="brand-sub">Portfolio analytics</div>
+        </div>
+      </div>
+
+      <nav class="nav flex-column mt-4 gap-2">
+        <a class="nav-link active" href="#overview"><i class="bi bi-speedometer2 me-2"></i>Overview</a>
+        <a class="nav-link" href="#events"><i class="bi bi-list-ul me-2"></i>Events</a>
+        <a class="nav-link" href="#leads"><i class="bi bi-envelope-paper me-2"></i>Leads</a>
+        <a class="nav-link" href="#charts"><i class="bi bi-graph-up-arrow me-2"></i>Charts</a>
+        <a class="nav-link" href="#settings"><i class="bi bi-gear me-2"></i>Settings</a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="small text-muted">Backend</div>
+        <div id="apiStatus" class="status-pill">Connecting...</div>
+        <button class="btn btn-glass w-100 mt-3" id="refreshBtn"><i class="bi bi-arrow-repeat me-2"></i>Refresh</button>
+        <button class="btn btn-outline-light w-100 mt-2" id="csvBtn"><i class="bi bi-download me-2"></i>Export CSV</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 class="page-title">Analytics Dashboard</h1>
+          <div class="page-subtitle">Visitor intelligence, download tracking, degree clicks, and anonymous insights</div>
+        </div>
+        <div class="topbar-actions">
+          <input id="tokenInput" type="password" class="form-control form-control-dark" placeholder="Admin token">
+          <button id="saveTokenBtn" class="btn btn-primary">Save Token</button>
+        </div>
+      </header>
+
+      <section id="overview" class="grid-kpis">
+        <div class="kpi-card"><div class="kpi-label">Total Events</div><div id="kpiEvents" class="kpi-value">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Unique Visitors</div><div id="kpiUnique" class="kpi-value">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Returning</div><div id="kpiReturning" class="kpi-value">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Leads</div><div id="kpiLeads" class="kpi-value">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Downloads</div><div id="kpiDownloads" class="kpi-value">0</div></div>
+        <div class="kpi-card"><div class="kpi-label">Degree Clicks</div><div id="kpiDegrees" class="kpi-value">0</div></div>
+      </section>
+
+      <section id="charts" class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Event Types</h3>
+            <span class="muted">Live distribution</span>
+          </div>
+          <div id="eventTypeList" class="list-stats"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Top Pages</h3>
+            <span class="muted">Most visited</span>
+          </div>
+          <div id="pageList" class="list-stats"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Anonymous Locations</h3>
+            <span class="muted">Country summary</span>
+          </div>
+          <div id="countryList" class="list-stats"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Device & Browser</h3>
+            <span class="muted">Traffic profile</span>
+          </div>
+          <div id="deviceList" class="list-stats"></div>
+          <div id="browserList" class="list-stats mt-3"></div>
+        </div>
+      </section>
+
+      <section id="events" class="panel mt-4">
+        <div class="panel-header">
+          <h3>Recent Events</h3>
+          <div class="filters">
+            <input id="searchInput" class="form-control form-control-dark" placeholder="Search events">
+            <select id="typeFilter" class="form-select form-select-dark">
+              <option value="">All types</option>
+              <option value="visit">visit</option>
+              <option value="click">click</option>
+              <option value="download">download</option>
+              <option value="degree_click">degree_click</option>
+              <option value="lead">lead</option>
+              <option value="scroll_depth">scroll_depth</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Type</th>
+                <th>Page</th>
+                <th>Device</th>
+                <th>Browser</th>
+                <th>Country</th>
+                <th>Info</th>
+              </tr>
+            </thead>
+            <tbody id="eventsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="leads" class="panel mt-4">
+        <div class="panel-header">
+          <h3>Contact Leads</h3>
+          <span class="muted">Submitted name/email only</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Subject</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+            <tbody id="leadsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="settings" class="panel mt-4">
+        <div class="panel-header">
+          <h3>System Notes</h3>
+          <span class="muted">Privacy-safe tracking</span>
+        </div>
+        <ul class="notes">
+          <li>No browser GPS permission is used.</li>
+          <li>Location is anonymous and IP-based only.</li>
+          <li>Lead data is stored only when users submit the form.</li>
+          <li>Admin API is protected by token.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    window.__API_BASE__ = 'https://admin.sachinthagaurawa.vercel.app';
+  </script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="admin-dashboard.js"></script>
+</body>
+</html>
